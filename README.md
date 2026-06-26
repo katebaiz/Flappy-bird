@@ -1,1 +1,1 @@
-Flappy Bird made by Python Tkinter
+Flappy Bird made in Python Tkinter
