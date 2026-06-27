@@ -6,6 +6,8 @@ HEIGHT = 600
 WIDTH = 800
 BIRD_SIZE = 30
 PILLAR = 30
+PILLAR_HEAD_W = 5
+PILLAR_HEAD_H = 30
 SHOW_HITBOX = True
 G = .1 #px/frame**2
 root = Tk()
@@ -13,9 +15,9 @@ canvas = Canvas(height=HEIGHT, width=WIDTH, bg="lightblue")
 canvas.pack()
 bird = canvas.create_oval(3*BIRD_SIZE, (.5*HEIGHT-BIRD_SIZE)//2, 4*BIRD_SIZE, (.5*HEIGHT+BIRD_SIZE)//2, fill="yellow", outline="black")
 bird_start_coords = canvas.coords(bird)
-hitbox = (canvas.create_rectangle(bird_start_coords[0], bird_start_coords[1]+BIRD_SIZE/4, bird_start_coords[2], bird_start_coords[3]-BIRD_SIZE/4, fill="green", outline="black"),
-          canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[1], bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[1]+BIRD_SIZE/4, fill="green", outline="black"),
-          canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[3]-BIRD_SIZE/4, bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[3], fill="green", outline="black"))
+hitbox = (canvas.create_rectangle(bird_start_coords[0], bird_start_coords[1]+BIRD_SIZE/4, bird_start_coords[2], bird_start_coords[3]-BIRD_SIZE/4, outline="black"),
+          canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[1], bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[1]+BIRD_SIZE/4, outline="black"),
+          canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[3]-BIRD_SIZE/4, bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[3], outline="black"))
 score = 0
 best_score = 0
 label1 = canvas.create_text(2*BIRD_SIZE, BIRD_SIZE, fill="black", text="SCORE", font=("Arial", BIRD_SIZE//2))
@@ -59,7 +61,9 @@ def create_wall():
     height = randint(0,HEIGHT-gap)
     w1 = canvas.create_rectangle(WIDTH, 0, WIDTH+PILLAR, height, fill="green")
     w2 = canvas.create_rectangle(WIDTH, height+gap, WIDTH+PILLAR, HEIGHT, fill="green")
-    walls.append((w1, w2))
+    h1 = canvas.create_rectangle(WIDTH-PILLAR_HEAD_W, height-PILLAR_HEAD_H, WIDTH+PILLAR+PILLAR_HEAD_W, height, fill="green")
+    h2 = canvas.create_rectangle(WIDTH-PILLAR_HEAD_W, height+gap, WIDTH+PILLAR+PILLAR_HEAD_W, height+PILLAR_HEAD_H+gap, fill="green")
+    walls.append((w1, w2, h1, h2))
 def move_wall():
     for i in walls:
         for j in i:
@@ -103,10 +107,12 @@ def check_score():
     if score > best_score: best_score = score
     canvas.itemconfig(best_score_label, text=best_score)
 def inversion():
-    global v_bird_multiplyer, calls
+    global v_bird_multiplyer, calls, v_bird, force
     if calls == 1:
         canvas.configure(bg="blue")
     elif calls == 2:
+        v_bird = 0
+        force = 0
         if v_bird_multiplyer == 1:
             canvas.configure(bg="lightgreen")
         else:
@@ -118,12 +124,12 @@ def game(event):
     play = False
     canvas.delete("all")
     bird = canvas.create_oval(3*BIRD_SIZE, (.5*HEIGHT-BIRD_SIZE)//2, 4*BIRD_SIZE, (.5*HEIGHT+BIRD_SIZE)//2, fill="yellow", outline="black")
-    hitbox = (canvas.create_rectangle(bird_start_coords[0], bird_start_coords[1]+BIRD_SIZE/4, bird_start_coords[2], bird_start_coords[3]-BIRD_SIZE/4, fill="green", outline="black"),
-              canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[1], bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[1]+BIRD_SIZE/4, fill="green", outline="black"),
-              canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[3]-BIRD_SIZE/4, bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[3], fill="green", outline="black"))
+    hitbox = (canvas.create_rectangle(bird_start_coords[0], bird_start_coords[1]+BIRD_SIZE/4, bird_start_coords[2], bird_start_coords[3]-BIRD_SIZE/4, outline="black"),
+              canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[1], bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[1]+BIRD_SIZE/4, outline="black"),
+              canvas.create_rectangle(bird_start_coords[0]+BIRD_SIZE/4, bird_start_coords[3]-BIRD_SIZE/4, bird_start_coords[2]-BIRD_SIZE/4, bird_start_coords[3], outline="black"))
     if not SHOW_HITBOX:
         for i in hitbox:
-            canvas.itemconfig(state="hidden")
+            canvas.itemconfig(i,state="hidden")
     t = 0
     v_bird = 0
     force = 0
