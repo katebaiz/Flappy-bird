@@ -8,7 +8,7 @@ BIRD_SIZE = 30
 PILLAR = 30
 PILLAR_HEAD_W = 5
 PILLAR_HEAD_H = 30
-SHOW_HITBOX = True
+SHOW_HITBOX = False
 G = .1 #px/frame**2
 root = Tk()
 canvas = Canvas(height=HEIGHT, width=WIDTH, bg="lightblue")
@@ -33,8 +33,11 @@ play = False
 calls = 0
 def jump(event):
     global force, play
-    if (event.keysym == "Up" or event.keysym == "w" or event.keysym == "space") and force == 0:
-        force = 20
+    if (event.keysym == "Up" or event.keysym == "w" or event.keysym == "space"):
+        if play and force == 0:
+            force = 20
+        elif not play:
+            game(0)
     elif event.keysym == "c":
         print("O")
         play = False
@@ -153,7 +156,7 @@ def game(event):
         move_bird()
         if wait1 == 0:
             create_wall()
-            wait1 = randint(75, 250)
+            wait1 = randint(100, 250)
         if wait2 == 0:
             calls = (calls+1)%3
             if calls == 1:
